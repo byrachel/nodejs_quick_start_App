@@ -8,7 +8,7 @@ const app = express();
 const mongoose = require('mongoose');
 
 // Connexion à notre BDD
-mongoose.connect('hmongodb+srv://ratch_admin_06:Loona0607@cluster0-jdb4r.mongodb.net/test?retryWrites=true&w=majority',
+mongoose.connect('',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))

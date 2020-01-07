@@ -7,8 +7,11 @@ const app = express();
 // Faciliter les intéractions avec notre BDD MongoDB
 const mongoose = require('mongoose');
 
+// Gestion des login mdp de la BDD
+var dotenv = require('dotenv').config();
+
 // Connexion à notre BDD
-mongoose.connect('',
+mongoose.connect( process.env.mongoDB ,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))

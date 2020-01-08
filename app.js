@@ -7,8 +7,14 @@ const app = express();
 // Faciliter les intéractions avec notre BDD MongoDB
 const mongoose = require('mongoose');
 
+// Import du module Body Parser qui transforme le corps de la requête en JSON
+const bodyParser = require('body-parser');
+
 // Gestion des login mdp de la BDD
 var dotenv = require('dotenv').config();
+
+// Import d'un méthode Express pour gérer les 'path'
+const path = require('path');
 
 // Connexion à notre BDD
 mongoose.connect( process.env.mongoDB ,
@@ -16,9 +22,6 @@ mongoose.connect( process.env.mongoDB ,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
-
-// Import du module Body Parser qui transforme le corps de la requête en JSON
-const bodyParser = require('body-parser');
 
 // 1er middleware exécuté : Gestion de l'erreur CORS (cross origin ressource sharing)
 app.use((req, res, next) => {
@@ -29,16 +32,18 @@ app.use((req, res, next) => {
     next();
   });
 
+// J'appelle la méthode bodyParser pour toutes les routes
+app.use(bodyParser.json());
+
 // import des routes
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
 
-// J'appelle la méthode bodyParser pour toutes les routes
-app.use(bodyParser.json());
-
 // Enregistrement des routes dans l'application
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
+// Accès à la lecture des images dans le dossier /img
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
 // Export : Permet d'accéder à ce fichier depuis toute l'application
 module.exports = app;

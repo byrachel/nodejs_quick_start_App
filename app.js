@@ -29,12 +29,16 @@ app.use((req, res, next) => {
     next();
   });
 
+// import des routes
+const stuffRoutes = require('./routes/stuff');
+const userRoutes = require('./routes/user');
+
 // J'appelle la méthode bodyParser pour toutes les routes
 app.use(bodyParser.json());
 
-// import des routes
-const stuffRoutes = require('./routes/stuff');
+// Enregistrement des routes dans l'application
 app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
 

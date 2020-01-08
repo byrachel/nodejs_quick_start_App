@@ -40,6 +40,7 @@ app.use(bodyParser.json());
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
 
+// Export : Permet d'accéder à ce fichier depuis toute l'application
 module.exports = app;
 
 
@@ -47,7 +48,6 @@ module.exports = app;
 // app.use((req,res,next) => {
 //     // Envoi d'un statut spécifique
 //     res.status(201);
-//     console.log('next');
 //     next();
 // })
 
@@ -55,5 +55,3 @@ module.exports = app;
 // app.use((req,res) => {
 //     res.json({message: 'requête reçue'});
 // })
-
-// Export : Permet d'accéder à ce fichier depuis toute l'application

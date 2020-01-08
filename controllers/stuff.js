@@ -1,10 +1,12 @@
 // Récupérer le schéma / modèle
 const Thing = require('../models/Thing');
 
+// Import du système de fichiers FS de Node
+const fs = require('fs');
+
 // Logique de la route POST : enregistre les données d'un formulaire
 exports.createThing = (req, res, next) => {
-    // Corps de la requête = req.body (chaque élément : req.body.title)
-    console.log(req.body);
+  // Corps de la requête = req.body (chaque élément : req.body.title)
   // L'image est transmise sous forme de 'string' -> je la transforme en objet
   const thingObject = JSON.parse(req.body.thing);
   // J'élimine l'ID automatique de Mongo car pas besoin en frontend
@@ -12,8 +14,7 @@ exports.createThing = (req, res, next) => {
   // J'instancie l'objet avec mon modèle
   // L'utilisation du mot-clé new avec un modèle Mongoose crée par défaut un champ_id
   const thing = new Thing({
-      // Cette syntaxe permet d'appeler tout l'objet en une seule ligne
-    //...req.body
+    // Cette syntaxe permet d'appeler tout l'objet en une seule ligne : ...req.body
     ...thingObject,
     // Je crée l'URL de l'image
     imageUrl: `${req.protocol}://${req.get('host')}/img/${req.file.filename}`
@@ -46,24 +47,36 @@ exports.modifyThing = (req, res, next) => {
 
 // Logique de la route DELETE pour supprimer un objet + :id comme paramètre
 exports.deleteThing = (req, res, next) => {
-    Thing.deleteOne({ _id: req.params.id })
+  // Récupérer l'url de l'image pour accéder à son nom
+  Thing.findOne({_id: req.params.id})
+    .then(thing => {
+      const filename = thing.imageUrl.split('/img/')[1]
+      // avec split() je récupère un tableau avec 2 éléments : ce qu'il y a avant /img/ et ce qu'il a après
+      // Avec [1] je récupère la deuxième partie
+      fs.unlink(`img/${filename}`, () => {
+        // avec la méthode unlink() je supprime le fichier image
+        // Puis je supprime l'objet :
+        Thing.deleteOne({ _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
         .catch(error => res.status(400).json({ error }));
+    });
+  })
+  .catch(error => res.status(500).json({ error }));
 }
 
 // Logique de la route GET pour afficher un seul objet + :id comme paramètre
 exports.getOneThing = (req, res, next) => {
-    // Méthode findOne + indicateur de comparaison : _id
-    Thing.findOne({ _id: req.params.id })
-        .then(thing => res.status(200).json(thing))
-        .catch(error => res.status(404).json({ error }));
+  // Méthode findOne + indicateur de comparaison : _id
+  Thing.findOne({ _id: req.params.id })
+      .then(thing => res.status(200).json(thing))
+      .catch(error => res.status(404).json({ error }));
 }
 
 // Logique de la route GET qui permet d'envoyer toutes les données au frontend
 exports.getAllStuff = (req, res, next) => {
-    // La méthode find permet de trouver tous les éléments dans la BDD
-    Thing.find()
-        // Things est le nom du tableau dans le BDD (pluriel du nom du schéma)
-      .then(things => res.status(200).json(things))
-      .catch(error => res.status(400).json({ error }));
+  // La méthode find permet de trouver tous les éléments dans la BDD
+  Thing.find()
+      // Things est le nom du tableau dans le BDD (pluriel du nom du schéma)
+    .then(things => res.status(200).json(things))
+    .catch(error => res.status(400).json({ error }));
 }
